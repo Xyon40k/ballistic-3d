@@ -22,10 +22,12 @@ float frictionmult = 1;
 
 boolean trails = false;
 boolean coinfluence = false;
+boolean bounded = true;
+PVector boundaries = new PVector(400,400,400);
 //
 
 // Simulated objects
-
+MassiveSystem ms = new MassiveSystem();
 //
 
 // Helper functions
@@ -45,6 +47,10 @@ float squared(float f) {
 int multSign(float f1, float f2) {
   return f1 >= 0 == f2 >= 0 ? 1 : -1;
 }
+
+int sgn(float x) {
+  return x > 0 ? 1 : -1;
+}
 //
 
 void setup() {
@@ -52,6 +58,9 @@ void setup() {
   stroke(#FFFFFF);
   strokeCap(ROUND);
   strokeWeight(3);
+  
+  ms.add(new GravCenter(0,0,0,10));
+  ms.add(new Particle(80,0,0,5,0,1,0));
 }
 
 void draw() {
@@ -62,7 +71,8 @@ void draw() {
   
   background(0);
   
-  point(100,0,0);
+  ms.update();
+  ms.display();
   
   if(keyPressed) {
     if(key == CODED) {

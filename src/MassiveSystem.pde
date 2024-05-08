@@ -7,11 +7,11 @@ class MassiveSystem {
     particles = new ArrayList<Particle>();
   }
   
-  void addParticle(Particle p) {
+  void add(Particle p) {
     particles.add(p);
   } 
   
-  void addGravCenter(GravCenter g) {
+  void add(GravCenter g) {
     gravs.add(g);
   }
   

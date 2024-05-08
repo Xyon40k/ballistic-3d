@@ -1,5 +1,5 @@
 class Particle extends GravCenter {
-  static final float sizemult = 1;
+  static final float sizemult = 2;
   
   PVector vel;
   Trail trail;
@@ -20,6 +20,22 @@ class Particle extends GravCenter {
     }
   }
   
+  Particle(float x, float y, float z, float mass, float dx, float dy, float dz) {
+    super(x,y,z,mass);
+    
+    if(mass > 0) {
+      c = #E00000;
+    } else {
+      c = #00E000;
+    }
+    
+    vel = new PVector(dx,dy,dz);
+    
+    if(trails) {
+      resetTrail();
+    }
+  }
+  
   Particle(float x, float y, float z, float mass, color c) {
     super(x,y,z,mass,c);
     
@@ -30,12 +46,37 @@ class Particle extends GravCenter {
     }
   }
   
+  void setVelocity(float dx, float dy, float dz) {
+    vel.set(dx,dy,dz);
+  }
+  
+  void checkBoundaries() {
+    if(bounded) {
+      if(abs(pos.x) > boundaries.x) {
+        pos.x = sgn(pos.x)*boundaries.x;
+        vel.x *= -1;
+      }
+      
+      if(abs(pos.y) > boundaries.y) {
+        pos.y = sgn(pos.y)*boundaries.y;
+        vel.y *= -1;
+      }
+      
+      if(abs(pos.z) > boundaries.z) {
+        pos.z = sgn(pos.z)*boundaries.z;
+        vel.z *= -1;
+      }
+    }
+  }
+  
   void update(ArrayList<GravCenter> gravs, ArrayList<Particle> particles) {
     if(trails) {
       trail.add(pos);
     }
     
     pos.add(vel);
+    checkBoundaries();
+    
     vel.add(getResultingAccelerationFrom(gravs, particles));
     vel.div(frictionmult);
   }
@@ -46,6 +87,8 @@ class Particle extends GravCenter {
     }
     
     pos.add(vel);
+    checkBoundaries();
+    
     vel.add(getResultingAccelerationFrom(gravs));
     vel.div(frictionmult);
   }
@@ -82,7 +125,9 @@ class Particle extends GravCenter {
   
   @Override
   void display() {
-    super.display();
+    stroke(c);
+    strokeWeight(mass*Particle.sizemult);
+    point(pos.x, pos.y, pos.z);
     
     if(trails) {
       trail.display();
@@ -94,16 +139,73 @@ class Particle extends GravCenter {
   }
   
   class Trail { // TODO: this
-    void display() {
+    Node head;
+    Node tail;
+    int count = 0;
+    
+    Trail() {
       
+    }
+  
+    void display() {
+      stroke(c);
+      // TODO: iterate and display
     }
     
     void add(PVector pos) {
-      
+      Node newest = new Node(pos);
+      if(count == 0) {
+        head = newest;
+        tail = newest;
+        count++;
+      } else if(count < mass*Particle.sizemult) {
+        newest.setNext(head);
+        head.setPrev(newest);
+        head = newest;
+        count++;
+      } else {
+        newest.setNext(head);
+        head.setPrev(newest);
+        head = newest;
+        tail.getPrev().setNext(null);
+        tail = tail.getPrev();
+      }
     }
     
     void reset() {
+      head = null;
+      tail = null;
+      count = 0;
+    }
+    
+    class Node {
+      PVector p;
+      Node next;
+      Node prev;
       
+      Node(PVector val) {
+        p = val;
+      }
+      
+      PVector getVal() {
+        return p;
+      }
+      
+      void setNext(Node n) {
+        next = n;
+      }
+      
+      Node getNext() {
+        return next;
+      }
+      
+      void setPrev(Node n) {
+        prev = n;
+      }
+      
+      Node getPrev() {
+        return prev;
+      }
     }
   }
 }

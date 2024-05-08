@@ -1,6 +1,6 @@
 class GravCenter {
   static final float gconst = 6.67428;
-  static final float sizemult = 0.5;
+  static final float sizemult = 2;
   
   PVector pos;
   float mass;
@@ -30,7 +30,7 @@ class GravCenter {
   
   void display() {
     stroke(c);
-    strokeWeight(mass*sizemult);
+    strokeWeight(mass*GravCenter.sizemult);
     point(pos.x, pos.y, pos.z);
   }
 }
