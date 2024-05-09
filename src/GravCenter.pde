@@ -28,9 +28,9 @@ class GravCenter {
     return res;
   }
   
-  void display() {
+  void display() { // TODO: resize based on depth
     stroke(c);
     strokeWeight(mass*GravCenter.sizemult);
-    point(pos.x, pos.y, pos.z);
+    point(zoom*pos.x, zoom*pos.y, zoom*pos.z);
   }
 }

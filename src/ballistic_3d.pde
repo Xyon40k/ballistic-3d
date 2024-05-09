@@ -13,15 +13,16 @@ float dy = 400;
 float at = 0.0001;
 float dt = 0.01;
 
-float zoom = 5;
+float zoom = 1;
 //
 
 // Simulation variables
 float forcemult = 1;
 float frictionmult = 1;
+float refinement = 3; // TODO: implement this somehow
 
-boolean trails = false;
-boolean coinfluence = false;
+boolean trails = true;
+boolean coinfluence = false; // TODO: fix influence when rho=0
 boolean bounded = true;
 PVector boundaries = new PVector(400,400,400);
 //
@@ -51,6 +52,18 @@ int multSign(float f1, float f2) {
 int sgn(float x) {
   return x > 0 ? 1 : -1;
 }
+
+color getGradient(color startc, color endc, float t) {
+  int r1 = (startc >> 16) & 0xFF;
+  int g1 = (startc >> 8) & 0xFF;
+  int b1 = startc & 0xFF;
+
+  int r2 = (endc >> 16) & 0xFF;
+  int g2 = (endc >> 8) & 0xFF;
+  int b2 = endc & 0xFF;
+
+  return color(r1+t*(r2-r1), g1+t*(g2-g1), b1+t*(b2-b1));
+}
 //
 
 void setup() {
@@ -59,8 +72,23 @@ void setup() {
   strokeCap(ROUND);
   strokeWeight(3);
   
-  ms.add(new GravCenter(0,0,0,10));
-  ms.add(new Particle(80,0,0,5,0,1,0));
+  // coinf = off
+  //ms.add(new GravCenter(-100,0,0,20));
+  //ms.add(new GravCenter(100,0,0,20));
+  //for(int i = 0; i < 12; i++) {
+  //  ms.add(new Particle(0,0,0,5).setVelocity(sin(i*TAU/12),2*cos(i*TAU/12),2*sin(i*TAU/12)));
+  //}
+  
+  // coinf = off
+  /*for(int i = 0; i < 3; i++) {
+    ms.add(new GravCenter(100*sin(i*TAU/3),100*-cos(i*TAU/3),0, 20));
+    ms.add(new Particle(0,0,0,5).setVelocity(2*sin((i+0.6)*TAU/3),2*-cos((i+0.6)*TAU/3),0));
+  }*/
+  
+  for(int i = 0; i < 8; i++) {
+    ms.add(new GravCenter(100*((i&1)*2-1),100*((i>>1&1)*2-1),100*((i>>2&1)*2-1), 20));
+    ms.add(new Particle(0,0,0,5).setVelocity(PVector.random3D().mult(2)));
+  }
 }
 
 void draw() {
@@ -74,6 +102,7 @@ void draw() {
   ms.update();
   ms.display();
   
+  // Camera controls
   if(keyPressed) {
     if(key == CODED) {
       switch(keyCode) {
@@ -95,6 +124,10 @@ void draw() {
       }
     } else {
       switch(key) {
+        case 'c':
+          ms.cleanup();
+          break;
+        
         case 'a':
           ay = mod2pi(ay+da);
           break;
@@ -137,4 +170,5 @@ void draw() {
       }
     }
   }
+  //
 }

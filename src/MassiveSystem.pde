@@ -1,4 +1,6 @@
 class MassiveSystem {
+  static final float maxacceptablespeed = 5; // TODO: find a good value
+  
   ArrayList<GravCenter> gravs;
   ArrayList<Particle> particles;
   
@@ -49,5 +51,14 @@ class MassiveSystem {
   
   void clearGravCenters() {
     gravs.clear();
+  }
+  
+  void cleanup() {
+    Iterator<Particle> it = particles.iterator();
+    while(it.hasNext()) {
+      if(it.next().getSpeed() > MassiveSystem.maxacceptablespeed) {
+        it.remove();
+      }
+    }
   }
 }
