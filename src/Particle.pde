@@ -1,3 +1,5 @@
+import java.util.Iterator;
+
 class Particle extends GravCenter {
   static final float sizemult = 2;
   
@@ -138,7 +140,9 @@ class Particle extends GravCenter {
     trail.reset();
   }
   
-  class Trail { // TODO: this
+  class Trail implements Iterable {// TODO: this
+    static final int size = 1;
+    
     Node head;
     Node tail;
     int count = 0;
@@ -178,6 +182,28 @@ class Particle extends GravCenter {
       count = 0;
     }
     
+    TrailIterator iterator() {
+      return new TrailIterator();
+    }
+    
+    class TrailIterator implements Iterator<PVector> {
+      private Node curr;
+      
+      TrailIterator() {
+        curr = head;
+      }
+      
+      PVector next() {
+        PVector v = curr.getValue();
+        curr = curr.getNext();
+        return v;
+      }
+      
+      boolean hasNext() {
+        return curr != null;
+      }
+    }
+    
     class Node {
       PVector p;
       Node next;
@@ -187,7 +213,7 @@ class Particle extends GravCenter {
         p = val;
       }
       
-      PVector getVal() {
+      PVector getValue() {
         return p;
       }
       
