@@ -18,6 +18,10 @@ class MassiveSystem {
   }
   
   void update() {
+    for(Particle p : particles) {
+      p.move();
+    }
+    
     if(coinfluence) {
       for(Particle p : particles) {
         p.update(gravs, particles);
@@ -26,6 +30,10 @@ class MassiveSystem {
       for(Particle p : particles) {
         p.update(gravs);
       }
+    }
+    
+    for(Particle p : particles) {
+      p.collapseUpdate();
     }
   }
   

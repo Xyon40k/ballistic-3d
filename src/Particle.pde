@@ -6,11 +6,16 @@ class Particle extends GravCenter {
   static final int trailupdateperiod = 5;
   
   PVector vel;
+  PVector nextVel;
   Trail trail;
   int trailupdatecounter = 0;
   
   Particle(float x, float y, float z, float mass) {
-    super(x,y,z,mass);
+    this(x,y,z,mass,mass*Particle.sizemult);
+  }
+  
+  Particle(float x, float y, float z, float mass, float size) {
+    super(x,y,z,mass,size);
     
     if(mass > 0) {
       c = #E00000;
@@ -25,8 +30,8 @@ class Particle extends GravCenter {
     }
   }
   
-  Particle(float x, float y, float z, float mass, color c) {
-    super(x,y,z,mass,c);
+  Particle(float x, float y, float z, float mass, float size, color c) {
+    super(x,y,z,mass,size,c);
     
     vel = new PVector(0,0,0);
     
@@ -49,8 +54,9 @@ class Particle extends GravCenter {
     return vel.mag();
   }
   
-  void setSpeed(float s) {
+  Particle setSpeed(float s) {
     vel.setMag(s);
+    return this;
   }
   
   void checkBoundaries() {
@@ -81,18 +87,55 @@ class Particle extends GravCenter {
       trailupdatecounter = (trailupdatecounter+1) % Particle.trailupdateperiod;
     }
     
-    pos.add(vel);
+    interactWith(gravs, particles);
     checkBoundaries();
-    
-    vel.add(getResultingAccelerationFrom(gravs, particles));
-    vel.div(frictionmult);
   }
   
   void update(ArrayList<GravCenter> gravs) {
     update(gravs, null);
   }
   
-  @Override
+  void interactWith(ArrayList<GravCenter> gravs, ArrayList<Particle> particles) {
+    PVector res = new PVector(0,0,0);
+    
+    PVector tmp;
+    for(GravCenter g : gravs) {
+      tmp = g.getDisplacementFrom(pos);
+      if(tmp.mag() < g.getSize()+size) {
+        // TODO: implement elastic collision
+      }
+      tmp.setMag(multSign(mass, g.getMass())*forcemult*gconst*g.getMass()/g.getDisplacementFrom(pos).magSq());
+      res.add(tmp);
+    }
+    
+    if(particles != null) {
+      for(Particle p : particles) {
+        if(p == this) {
+          continue;
+        }
+        
+        tmp = p.getDisplacementFrom(pos);
+        tmp.setMag(multSign(mass, p.getMass())*forcemult*gconst*p.getMass()/p.getDisplacementFrom(pos).magSq());
+        res.add(tmp);
+      }
+    }
+    
+    nextVel = PVector.add(vel, res).div(frictionmult);
+  }
+  
+  void interactWith(ArrayList<GravCenter> gravs) {
+    interactWith(gravs, null);
+  }
+  
+  void collapseUpdate() {
+    vel = nextVel;
+  }
+  
+  void move() {
+    pos.add(vel);
+  }
+  
+  /*@Override
   PVector getInducedAccelerationOn(Particle p) {
     if(p == this) {
       return new PVector(0,0,0);
@@ -117,21 +160,11 @@ class Particle extends GravCenter {
   
   PVector getResultingAccelerationFrom(ArrayList<GravCenter> gravs) {
     return getResultingAccelerationFrom(gravs, null);
-  }
+  }*/
   
   @Override
   void display() {
-    if(depthful) {
-      fill(c);
-      pushMatrix();
-      translate(zoom*pos.x, zoom*pos.y, zoom*pos.z);
-      sphere(mass*Particle.sizemult*zoom*0.5);
-      popMatrix();
-    } else {
-      stroke(c);
-      strokeWeight(mass*Particle.sizemult*zoom);
-      point(zoom*pos.x, zoom*pos.y, zoom*pos.z);
-    }
+    super.display();
     
     if(trails) {
       trail.display();

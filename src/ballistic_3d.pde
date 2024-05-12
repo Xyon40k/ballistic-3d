@@ -22,11 +22,12 @@ float frictionmult = 1;
 float refinement = 3; // TODO: implement this somehow
 
 boolean trails = true;
-boolean depthful = false;
+boolean depthful = true;
 
 boolean coinfluence = true; // TODO: fix influence when rho=0
 boolean bounded = true;
 PVector boundaries = new PVector(400,400,400);
+boolean collisions = true;
 //
 
 // Simulated objects
@@ -97,8 +98,9 @@ void setup() {
   //  ms.add(new Particle(0,0,0,5).setVelocity(PVector.random3D().mult(2)));
   //}
   
-  ms.add(new Particle(100,0,0,5));
-  ms.add(new Particle(-100,0,0,5));
+  ms.add(new GravCenter(0,0,0,10));
+  ms.add(new Particle(100,10,0,5).setVelocity(-1,1,0).setSpeed(0.1));
+  //ms.add(new Particle(-100,-10,0,5).setVelocity(1,-1,0).setSpeed(0.1));
 }
 
 void draw() {
