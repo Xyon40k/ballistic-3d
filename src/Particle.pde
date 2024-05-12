@@ -1,7 +1,7 @@
 import java.util.Iterator;
 
 class Particle extends GravCenter {
-  static final float sizemult = 2;
+  static final float sizemult = 1;
   static final int defaulttraillength = 100;
   static final int trailupdateperiod = 5;
   

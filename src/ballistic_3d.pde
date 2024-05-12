@@ -22,10 +22,11 @@ float frictionmult = 1;
 float refinement = 3; // TODO: implement this somehow
 
 boolean trails = true;
-boolean coinfluence = false; // TODO: fix influence when rho=0
+boolean depthful = false;
+
+boolean coinfluence = true; // TODO: fix influence when rho=0
 boolean bounded = true;
 PVector boundaries = new PVector(400,400,400);
-boolean depthful = true;
 //
 
 // Simulated objects
@@ -77,24 +78,27 @@ void setup() {
     noStroke();
   }
   
-  // coinf = off
+  // two gravs with circle spread of particles, coinf = off
   //ms.add(new GravCenter(-100,0,0,20));
   //ms.add(new GravCenter(100,0,0,20));
   //for(int i = 0; i < 12; i++) {
   //  ms.add(new Particle(0,0,0,5).setVelocity(sin(i*TAU/12),2*cos(i*TAU/12),2*sin(i*TAU/12)));
   //}
   
-  // coinf = off
-  for(int i = 0; i < 3; i++) {
-    ms.add(new GravCenter(100*sin(i*TAU/3),100*-cos(i*TAU/3),0, 20));
-    ms.add(new Particle(0,0,0,5).setVelocity(2*sin((i+0.6)*TAU/3),2*-cos((i+0.6)*TAU/3),0));
-  }
+  // triangle of gravs with 3 particles, coinf = off
+  //for(int i = 0; i < 3; i++) {
+  //  ms.add(new GravCenter(100*sin(i*TAU/3),100*-cos(i*TAU/3),0, 20));
+  //  ms.add(new Particle(0,0,0,5).setVelocity(2*sin((i+0.6)*TAU/3),2*-cos((i+0.6)*TAU/3),0));
+  //}
   
   // cube of gravs with random velocity particles, coinf = off
   //for(int i = 0; i < 8; i++) {
   //  ms.add(new GravCenter(100*((i&1)*2-1),100*((i>>1&1)*2-1),100*((i>>2&1)*2-1), 20));
   //  ms.add(new Particle(0,0,0,5).setVelocity(PVector.random3D().mult(2)));
   //}
+  
+  ms.add(new Particle(100,0,0,5));
+  ms.add(new Particle(-100,0,0,5));
 }
 
 void draw() {

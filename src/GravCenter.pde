@@ -1,6 +1,6 @@
 class GravCenter {
   static final float gconst = 6.67428;
-  static final float sizemult = 2;
+  static final float sizemult = 1;
   
   PVector pos;
   float mass;
