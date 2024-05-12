@@ -49,6 +49,10 @@ class Particle extends GravCenter {
     return vel.mag();
   }
   
+  void setSpeed(float s) {
+    vel.setMag(s);
+  }
+  
   void checkBoundaries() {
     if(bounded) {
       if(abs(pos.x) > boundaries.x) {
@@ -116,10 +120,18 @@ class Particle extends GravCenter {
   }
   
   @Override
-  void display() { // TODO: resize based on depth
-    stroke(c);
-    strokeWeight(mass*Particle.sizemult);
-    point(zoom*pos.x, zoom*pos.y, zoom*pos.z);
+  void display() {
+    if(depthful) {
+      fill(c);
+      pushMatrix();
+      translate(zoom*pos.x, zoom*pos.y, zoom*pos.z);
+      sphere(mass*Particle.sizemult*zoom*0.5);
+      popMatrix();
+    } else {
+      stroke(c);
+      strokeWeight(mass*Particle.sizemult*zoom);
+      point(zoom*pos.x, zoom*pos.y, zoom*pos.z);
+    }
     
     if(trails) {
       trail.display();
@@ -161,6 +173,8 @@ class Particle extends GravCenter {
         last = p;
         i++;
       }
+      
+      noStroke();
     }
     
     void add(PVector pos) {

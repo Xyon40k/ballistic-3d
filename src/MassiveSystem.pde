@@ -61,4 +61,12 @@ class MassiveSystem {
       }
     }
   }
+  
+  void slow() {
+    for(Particle p : particles) {
+      if(p.getSpeed() > MassiveSystem.maxacceptablespeed) {
+        p.setSpeed(0);
+      }
+    }
+  }
 }

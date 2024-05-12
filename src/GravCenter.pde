@@ -28,9 +28,17 @@ class GravCenter {
     return res;
   }
   
-  void display() { // TODO: resize based on depth
-    stroke(c);
-    strokeWeight(mass*GravCenter.sizemult);
-    point(zoom*pos.x, zoom*pos.y, zoom*pos.z);
+  void display() {
+    if(depthful) {
+      fill(c); 
+      pushMatrix();
+      translate(zoom*pos.x, zoom*pos.y, zoom*pos.z);
+      sphere(mass*GravCenter.sizemult*zoom*0.5);
+      popMatrix();
+    } else {
+      stroke(c);
+      strokeWeight(mass*GravCenter.sizemult*zoom);
+      point(zoom*pos.x, zoom*pos.y, zoom*pos.z);
+    }
   }
 }

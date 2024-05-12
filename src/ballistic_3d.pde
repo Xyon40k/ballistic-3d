@@ -25,6 +25,7 @@ boolean trails = true;
 boolean coinfluence = false; // TODO: fix influence when rho=0
 boolean bounded = true;
 PVector boundaries = new PVector(400,400,400);
+boolean depthful = true;
 //
 
 // Simulated objects
@@ -68,9 +69,13 @@ color getGradient(color startc, color endc, float t) {
 
 void setup() {
   size(800,800,P3D);
-  stroke(#FFFFFF);
-  strokeCap(ROUND);
-  strokeWeight(3);
+  if(!depthful) {
+    stroke(#FFFFFF);
+    strokeCap(ROUND);
+  } else {
+    sphereDetail(12,6);
+    noStroke();
+  }
   
   // coinf = off
   //ms.add(new GravCenter(-100,0,0,20));
@@ -80,15 +85,16 @@ void setup() {
   //}
   
   // coinf = off
-  /*for(int i = 0; i < 3; i++) {
+  for(int i = 0; i < 3; i++) {
     ms.add(new GravCenter(100*sin(i*TAU/3),100*-cos(i*TAU/3),0, 20));
     ms.add(new Particle(0,0,0,5).setVelocity(2*sin((i+0.6)*TAU/3),2*-cos((i+0.6)*TAU/3),0));
-  }*/
-  
-  for(int i = 0; i < 8; i++) {
-    ms.add(new GravCenter(100*((i&1)*2-1),100*((i>>1&1)*2-1),100*((i>>2&1)*2-1), 20));
-    ms.add(new Particle(0,0,0,5).setVelocity(PVector.random3D().mult(2)));
   }
+  
+  // cube of gravs with random velocity particles, coinf = off
+  //for(int i = 0; i < 8; i++) {
+  //  ms.add(new GravCenter(100*((i&1)*2-1),100*((i>>1&1)*2-1),100*((i>>2&1)*2-1), 20));
+  //  ms.add(new Particle(0,0,0,5).setVelocity(PVector.random3D().mult(2)));
+  //}
 }
 
 void draw() {
@@ -126,6 +132,10 @@ void draw() {
       switch(key) {
         case 'c':
           ms.cleanup();
+          break;
+          
+        case 't':
+          ms.slow();
           break;
         
         case 'a':
@@ -170,5 +180,4 @@ void draw() {
       }
     }
   }
-  //
 }
