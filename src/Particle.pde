@@ -6,7 +6,7 @@ class Particle extends GravCenter {
   static final int trailupdateperiod = 5;
   
   PVector vel;
-  PVector nextVel;
+  PVector acc;
   Trail trail;
   int trailupdatecounter = 0;
   
@@ -24,6 +24,7 @@ class Particle extends GravCenter {
     }
     
     vel = new PVector(0,0,0);
+    acc = new PVector(0,0,0);
     
     if(trails) {
       trail = new Trail(defaulttraillength);
@@ -60,7 +61,6 @@ class Particle extends GravCenter {
   }
   
   void checkBoundaries() {
-    if(bounded) {
       if(abs(pos.x) > boundaries.x) {
         pos.x = sgn(pos.x)*boundaries.x;
         vel.x *= -1;
@@ -75,10 +75,9 @@ class Particle extends GravCenter {
         pos.z = sgn(pos.z)*boundaries.z;
         vel.z *= -1;
       }
-    }
   }
   
-  void update(ArrayList<GravCenter> gravs, ArrayList<Particle> particles) {
+  void update(ArrayList<GravCenter> gravs) {
     if(trails) {
       if(trailupdatecounter == 0) {
         trail.add(pos.copy());
@@ -87,80 +86,42 @@ class Particle extends GravCenter {
       trailupdatecounter = (trailupdatecounter+1) % Particle.trailupdateperiod;
     }
     
-    interactWith(gravs, particles);
-    checkBoundaries();
-  }
-  
-  void update(ArrayList<GravCenter> gravs) {
-    update(gravs, null);
-  }
-  
-  void interactWith(ArrayList<GravCenter> gravs, ArrayList<Particle> particles) {
-    PVector res = new PVector(0,0,0);
-    
-    PVector tmp;
     for(GravCenter g : gravs) {
-      tmp = g.getDisplacementFrom(pos);
-      if(tmp.mag() < g.getSize()+size) {
-        // TODO: implement elastic collision
-      }
-      tmp.setMag(multSign(mass, g.getMass())*forcemult*gconst*g.getMass()/g.getDisplacementFrom(pos).magSq());
-      res.add(tmp);
+      if(!coinfluence && g instanceof Particle) continue;
+      interactWith(g);
     }
     
-    if(particles != null) {
-      for(Particle p : particles) {
-        if(p == this) {
-          continue;
-        }
-        
-        tmp = p.getDisplacementFrom(pos);
-        tmp.setMag(multSign(mass, p.getMass())*forcemult*gconst*p.getMass()/p.getDisplacementFrom(pos).magSq());
-        res.add(tmp);
-      }
+    if(bounded) {
+      checkBoundaries();
     }
-    
-    nextVel = PVector.add(vel, res).div(frictionmult);
   }
   
-  void interactWith(ArrayList<GravCenter> gravs) {
-    interactWith(gravs, null);
+  void interactWith(GravCenter g) {
+    if(g == this) return;
+    
+    PVector tmp = getDisplacementTo(g.pos);
+    if(tmp.mag() < g.size+size) {
+      // TODO: implement elastic collision
+    }
+    
+    //tmp.setMag(multSign(mass, g.getMass())*forcemult*gconst*g.getMass()/g.getDisplacementFrom(pos).magSq());
+    tmp.setMag(forcemult*gconst*g.mass/max(tmp.magSq(), minDist));
+    acc.add(tmp);
   }
   
   void collapseUpdate() {
-    vel = nextVel;
+    vel.add(acc.div(frictionmult));
+    acc = new PVector(0,0,0);
   }
   
   void move() {
     pos.add(vel);
   }
   
-  /*@Override
-  PVector getInducedAccelerationOn(Particle p) {
-    if(p == this) {
-      return new PVector(0,0,0);
-    }
-    return super.getInducedAccelerationOn(p);
+  Particle setInfiniteTrail() {
+    trail.setInfinite();
+    return this;
   }
-  
-  PVector getResultingAccelerationFrom(ArrayList<GravCenter> gravs, ArrayList<Particle> particles) {
-    PVector res = new PVector(0,0,0);
-    for(GravCenter g : gravs) {
-      res.add(g.getInducedAccelerationOn(this));
-    }
-    
-    if(particles != null) {
-      for(Particle p : particles) {
-        res.add(p.getInducedAccelerationOn(this));
-      }
-    }
-    
-    return res;
-  }
-  
-  PVector getResultingAccelerationFrom(ArrayList<GravCenter> gravs) {
-    return getResultingAccelerationFrom(gravs, null);
-  }*/
   
   @Override
   void display() {
@@ -184,6 +145,7 @@ class Particle extends GravCenter {
     int count = 0;
     color startc = c;
     color endc = #D2E33D;
+    boolean infinite;
     
     Trail(int cap, color startc, color endc) {
       this.startc = startc;
@@ -216,7 +178,7 @@ class Particle extends GravCenter {
         head = newest;
         tail = newest;
         count++;
-      } else if(count < capacity) {
+      } else if(count < capacity || infinite) {
         newest.setNext(head);
         head.setPrev(newest);
         head = newest;
@@ -234,6 +196,10 @@ class Particle extends GravCenter {
       head = null;
       tail = null;
       count = 0;
+    }
+    
+    void setInfinite() {
+      infinite = true;
     }
     
     TrailIterator iterator() {

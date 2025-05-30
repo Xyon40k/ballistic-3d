@@ -29,14 +29,6 @@ class GravCenter {
     this.c = c;
   }
   
-  float getMass() {
-    return mass;
-  }
-  
-  float getSize() {
-    return size;
-  }
-  
   /*PVector getInducedAccelerationOn(Particle p) {
     PVector res = new PVector(pos.x-p.pos.x,pos.y-p.pos.y,pos.z-p.pos.z);
     res.setMag(multSign(mass, p.mass)*forcemult*gconst*mass/squared(pos.dist(p.pos)));

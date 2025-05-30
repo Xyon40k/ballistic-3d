@@ -2,78 +2,73 @@ class MassiveSystem {
   static final float maxacceptablespeed = 5; // TODO: find a good value
   
   ArrayList<GravCenter> gravs;
-  ArrayList<Particle> particles;
   
   MassiveSystem() {
     gravs = new ArrayList<GravCenter>();
-    particles = new ArrayList<Particle>();
   }
-  
-  void add(Particle p) {
-    particles.add(p);
-  } 
   
   void add(GravCenter g) {
     gravs.add(g);
   }
   
   void update() {
-    for(Particle p : particles) {
-      p.move();
-    }
-    
-    if(coinfluence) {
-      for(Particle p : particles) {
-        p.update(gravs, particles);
-      }
-    } else {
-      for(Particle p : particles) {
-        p.update(gravs);
+    for(GravCenter g : gravs) {
+      if(g instanceof Particle) {
+        ((Particle)g).move(); 
       }
     }
     
-    for(Particle p : particles) {
-      p.collapseUpdate();
+    for(GravCenter g : gravs) {
+      if(g instanceof Particle) {
+        ((Particle)g).update(gravs); 
+      }
+    }
+    
+    for(GravCenter g : gravs) {
+      if(g instanceof Particle) {
+        ((Particle)g).collapseUpdate(); 
+      }
     }
   }
   
   void display() {
-    for(Particle p : particles) {
-      p.display();
-    }
-    
     for(GravCenter g : gravs) {
       g.display();
     }
   }
   
   void resetTrails() {
-    for(Particle p : particles) {
-      p.resetTrail();
+    for(GravCenter g : gravs) {
+      if(g instanceof Particle) {
+        ((Particle)g).resetTrail(); 
+      }
     }
   }
   
-  void clearParticles() {
-    particles.clear();
-  }
-  
-  void clearGravCenters() {
+  void clear() {
     gravs.clear();
   }
   
   void cleanup() {
-    Iterator<Particle> it = particles.iterator();
-    while(it.hasNext()) {
-      if(it.next().getSpeed() > MassiveSystem.maxacceptablespeed) {
-        it.remove();
+    Particle p;
+    for(int i = 0; i < gravs.size(); i++) {
+      if(gravs.get(i) instanceof Particle) {
+        p = (Particle)gravs.get(i);
+        if(p.getSpeed() > MassiveSystem.maxacceptablespeed) {
+          gravs.remove(i);
+        }
       }
     }
   }
   
   void slow() {
-    for(Particle p : particles) {
-      if(p.getSpeed() > MassiveSystem.maxacceptablespeed) {
-        p.setSpeed(0);
+    Particle p;
+    for(int i = 0; i < gravs.size(); i++) {
+      if(gravs.get(i) instanceof Particle) {
+        p = (Particle)gravs.get(i);
+        if(p.getSpeed() > MassiveSystem.maxacceptablespeed) {
+          p.setSpeed(0);
+        }
       }
     }
   }

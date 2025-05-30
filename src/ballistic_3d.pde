@@ -20,12 +20,13 @@ float zoom = 1;
 float forcemult = 1;
 float frictionmult = 1;
 float refinement = 3; // TODO: implement this somehow
+float minDist = 0.1;
 
 boolean trails = true;
 boolean depthful = true;
 
-boolean coinfluence = true; // TODO: fix influence when rho=0
-boolean bounded = true;
+boolean coinfluence = false; // TODO: fix influence when rho=0
+boolean bounded = false;
 PVector boundaries = new PVector(400,400,400);
 boolean collisions = true;
 //
@@ -83,23 +84,30 @@ void setup() {
   //ms.add(new GravCenter(-100,0,0,20));
   //ms.add(new GravCenter(100,0,0,20));
   //for(int i = 0; i < 12; i++) {
-  //  ms.add(new Particle(0,0,0,5).setVelocity(sin(i*TAU/12),2*cos(i*TAU/12),2*sin(i*TAU/12)));
+  //  ms.add(new Particle(0,0,0,5).setVelocity(sin(i*TAU/12),2*cos(i*TAU/12),2*sin(i*TAU/12)).setInfiniteTrail());
   //}
+  
+  // tetrahedron of particles with grav core, coinf = on
+  //ms.add(new Particle(100,-100,-100,5).setVelocity(-1,1,0).setInfiniteTrail());
+  //ms.add(new Particle(-100,100,-100,5).setVelocity(0,-1,1).setInfiniteTrail());
+  //ms.add(new Particle(-100,-100,100,5).setVelocity(1,1,0).setInfiniteTrail());
+  //ms.add(new Particle(100,100,100,5).setVelocity(0,-1,-1).setInfiniteTrail());
+  //ms.add(new GravCenter(0,0,0,25));
   
   // triangle of gravs with 3 particles, coinf = off
   //for(int i = 0; i < 3; i++) {
   //  ms.add(new GravCenter(100*sin(i*TAU/3),100*-cos(i*TAU/3),0, 20));
-  //  ms.add(new Particle(0,0,0,5).setVelocity(2*sin((i+0.6)*TAU/3),2*-cos((i+0.6)*TAU/3),0));
+  //  ms.add(new Particle(0,0,0,5).setVelocity(2*sin((i+0.6)*TAU/3),2*-cos((i+0.6)*TAU/3),0).setInfiniteTrail());
   //}
   
   // cube of gravs with random velocity particles, coinf = off
-  //for(int i = 0; i < 8; i++) {
-  //  ms.add(new GravCenter(100*((i&1)*2-1),100*((i>>1&1)*2-1),100*((i>>2&1)*2-1), 20));
-  //  ms.add(new Particle(0,0,0,5).setVelocity(PVector.random3D().mult(2)));
-  //}
+  for(int i = 0; i < 8; i++) {
+    ms.add(new GravCenter(100*((i&1)*2-1),100*((i>>1&1)*2-1),100*((i>>2&1)*2-1), 20));
+  }
+  ms.add(new Particle(0,0,0,5).setVelocity(PVector.random3D().mult(2)).setInfiniteTrail());
   
-  ms.add(new GravCenter(0,0,0,10));
-  ms.add(new Particle(100,10,0,5).setVelocity(-1,1,0).setSpeed(0.1));
+  //ms.add(new GravCenter(0,0,0,10));
+  //ms.add(new Particle(100,10,0,5).setVelocity(-1,1,0).setSpeed(0.1));
   //ms.add(new Particle(-100,-10,0,5).setVelocity(1,-1,0).setSpeed(0.1));
 }
 
@@ -142,6 +150,10 @@ void draw() {
           
         case 't':
           ms.slow();
+          break;
+          
+        case 'r':
+          ms.resetTrails();
           break;
         
         case 'a':
